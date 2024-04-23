@@ -10,7 +10,7 @@ import models.PersistedDurableJobModel;
  * Provides the means of looking up a {@link DurableJob} by its {@link DurableJobName}. This is
  * necessary because all {@link DurableJob}s are persisted by {@link PersistedDurableJobModel}
  * records. Also provides the means of retrieving a list of all recurring jobs with their associated
- * {@link RecurringJobExecutionTimeResolver}.
+ * {@link ExecutionTimeResolver}.
  */
 public final class DurableJobRegistry {
 
@@ -28,7 +28,7 @@ public final class DurableJobRegistry {
    * A {@link DurableJob} that has been registered with the {@link DurableJobRegistry}.
    *
    * <p>When added to the registry, jobs are associated with their factories, job names, and
-   * optionally a {@link RecurringJobExecutionTimeResolver} if they are recurring jobs.
+   * optionally a {@link ExecutionTimeResolver} if they are recurring jobs.
    */
   @AutoValue
   public abstract static class RegisteredJob {
@@ -36,9 +36,9 @@ public final class DurableJobRegistry {
     private static RegisteredJob create(
         DurableJobFactory durableJobFactory,
         DurableJobName jobName,
-        Optional<RecurringJobExecutionTimeResolver> recurringJobExecutionTimeResolver) {
+        Optional<ExecutionTimeResolver> executionTimeResolver) {
       return new AutoValue_DurableJobRegistry_RegisteredJob(
-          durableJobFactory, jobName, recurringJobExecutionTimeResolver);
+          durableJobFactory, jobName, executionTimeResolver);
     }
 
     /** The {@link DurableJobFactory} factory for this {@link DurableJob}. */
@@ -48,16 +48,15 @@ public final class DurableJobRegistry {
     public abstract DurableJobName getJobName();
 
     /**
-     * The {@link RecurringJobExecutionTimeResolver} for this {@link DurableJob}.
+     * The {@link ExecutionTimeResolver} for this {@link DurableJob}.
      *
      * <p>If not present then this job is not recurring.
      */
-    public abstract Optional<RecurringJobExecutionTimeResolver>
-        getRecurringJobExecutionTimeResolver();
+    public abstract Optional<ExecutionTimeResolver> getExecutionTimeResolver();
 
     /** True if this job is recurring. */
     public boolean isRecurring() {
-      return this.getRecurringJobExecutionTimeResolver().isPresent();
+      return this.getExecutionTimeResolver().isPresent();
     }
   }
 
@@ -68,23 +67,22 @@ public final class DurableJobRegistry {
     registeredJobs.put(
         jobName.getJobNameString(),
         RegisteredJob.create(
-            durableJobFactory, jobName, /* recurringJobExecutionTimeResolver= */ Optional.empty()));
+            durableJobFactory, jobName, /* executionTimeResolver= */ Optional.empty()));
   }
 
   /**
-   * Registers a factory for a given job name along with a {@link RecurringJobExecutionTimeResolver}
-   * that defines the future run times of the job.
+   * Registers a factory for a given job name along with a {@link ExecutionTimeResolver} that
+   * defines the future run times of the job.
    */
   public void register(
       DurableJobName jobName,
       DurableJobFactory durableJobFactory,
-      RecurringJobExecutionTimeResolver recurringJobExecutionTimeResolver) {
+      ExecutionTimeResolver executionTimeResolver) {
     validateJobName(jobName);
 
     registeredJobs.put(
         jobName.getJobNameString(),
-        RegisteredJob.create(
-            durableJobFactory, jobName, Optional.of(recurringJobExecutionTimeResolver)));
+        RegisteredJob.create(durableJobFactory, jobName, Optional.of(executionTimeResolver)));
   }
 
   private void validateJobName(DurableJobName jobName) {
@@ -100,7 +98,7 @@ public final class DurableJobRegistry {
         .orElseThrow(() -> new JobNotFoundException(jobName.getJobNameString()));
   }
 
-  /** Returns all jobs registered with a {@link RecurringJobExecutionTimeResolver}. */
+  /** Returns all jobs registered with a {@link ExecutionTimeResolver}. */
   public ImmutableSet<RegisteredJob> getRecurringJobs() {
     return registeredJobs.values().stream()
         .filter(RegisteredJob::isRecurring)
