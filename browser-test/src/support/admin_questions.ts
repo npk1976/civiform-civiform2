@@ -21,6 +21,7 @@ type QuestionParams = {
   exportOption?: string
   universal?: boolean
   primaryApplicantInfo?: boolean // Ignored if there isn't one for the question type
+  maxEntities?: number | null
 }
 
 // Should match the fieldName set in PrimaryApplicantInfoTag.java
@@ -1434,6 +1435,7 @@ export class AdminQuestions {
     enumeratorName = AdminQuestions.DOES_NOT_REPEAT_OPTION,
     exportOption = '',
     universal = false,
+    maxEntities = null,
   }: QuestionParams) {
     await this.gotoAdminQuestionsPage()
 
@@ -1452,6 +1454,9 @@ export class AdminQuestions {
     })
 
     await this.page.fill('text=Repeated entity type', 'Entity')
+    if (maxEntities != null) {
+      await this.page.fill('text=Maximum entity count', String(maxEntities))
+    }
 
     await this.clickSubmitButtonAndNavigate('Create')
 

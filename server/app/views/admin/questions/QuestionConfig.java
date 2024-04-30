@@ -149,7 +149,13 @@ public final class QuestionConfig {
             .setLabelText("Repeated entity type (What are we enumerating?)")
             .setRequired(true)
             .setValue(enumeratorQuestionForm.getEntityType())
-            .getInputTag());
+            .getInputTag(),
+        FieldWithLabel.number()
+            .setFieldName("maxEntities")
+            .setLabelText("Maximum entity count")
+            .setRequired(false)
+            .setValue(enumeratorQuestionForm.getMaxEntities())
+            .getNumberTag());
     return this;
   }
 

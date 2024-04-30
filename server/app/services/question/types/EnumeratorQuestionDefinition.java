@@ -2,7 +2,11 @@ package services.question.types;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import java.util.OptionalLong;
 import services.LocalizedStrings;
 
 /**
@@ -44,10 +48,49 @@ public class EnumeratorQuestionDefinition extends QuestionDefinition {
     return entityType;
   }
 
+  public OptionalLong getMaxEntities() {
+    return getEnumeratorValidationPredicates().maxEntities();
+  }
+
+  @JsonDeserialize(
+      builder = AutoValue_EnumeratorQuestionDefinition_EnumeratorValidationPredicates.Builder.class)
   @AutoValue
   public abstract static class EnumeratorValidationPredicates extends ValidationPredicates {
+
+    public static EnumeratorValidationPredicates parse(String jsonString) {
+      try {
+        return mapper.readValue(
+            jsonString,
+            AutoValue_EnumeratorQuestionDefinition_EnumeratorValidationPredicates.class);
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     public static EnumeratorValidationPredicates create() {
-      return new AutoValue_EnumeratorQuestionDefinition_EnumeratorValidationPredicates();
+      return builder().build();
+    }
+
+    public static EnumeratorValidationPredicates create(long maxEntities) {
+      return builder().setMaxEntities(maxEntities).build();
+    }
+
+    @JsonProperty("maxEntities")
+    public abstract OptionalLong maxEntities();
+
+    public static Builder builder() {
+      return new AutoValue_EnumeratorQuestionDefinition_EnumeratorValidationPredicates.Builder();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+      @JsonProperty("maxEntities")
+      public abstract Builder setMaxEntities(OptionalLong maxEntities);
+
+      public abstract Builder setMaxEntities(long maxEntities);
+
+      public abstract EnumeratorValidationPredicates build();
     }
   }
 }

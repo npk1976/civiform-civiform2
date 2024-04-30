@@ -213,8 +213,7 @@ function addEnumeratorListeners() {
 }
 
 /**
- * Disable the add button if there are empty inputs, re-enable the add button otherwise.
- * (We don't need two blank inputs.)
+ * Make the add button disabled iff there are empty inputs (we don't need two blank inputs) or the user has reached the maximum number of inputs.
  * @param {Element} enumeratorQuestion The question to hide/show the add button for.
  */
 function maybeToggleEnumeratorAddButton(enumeratorQuestion: Element) {
@@ -223,12 +222,15 @@ function maybeToggleEnumeratorAddButton(enumeratorQuestion: Element) {
       enumeratorQuestion.querySelectorAll('input[data-entity-input]'),
     ).map((item) => (item as HTMLInputElement).value)
 
-    // validate that there are no empty inputs.
     const addButton = <HTMLInputElement>(
       document.getElementById('enumerator-field-add-button')
     )
     if (addButton) {
-      addButton.disabled = enumeratorInputValues.includes('')
+      const maxEntities = Number(addButton.dataset.maxEntities)
+      addButton.disabled =
+        enumeratorInputValues.includes('') ||
+        (Number.isInteger(maxEntities) &&
+          enumeratorInputValues.length >= maxEntities)
     }
   }
 }

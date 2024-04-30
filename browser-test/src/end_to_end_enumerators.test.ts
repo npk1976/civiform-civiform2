@@ -314,8 +314,27 @@ test.describe('End to end enumerator test', () => {
         await applicantQuestions.clickNext()
       })
 
-      await test.step('Add button is enabled with a non-blank entity', async () => {
+      await test.step('Add button is disabled when the maximum number of entities is entered', async () => {
         await applicantQuestions.addEnumeratorAnswer('Bugs')
+        await applicantQuestions.addEnumeratorAnswer('Daffy')
+        await applicantQuestions.addEnumeratorAnswer('Donald')
+
+        await expect(
+          page.locator('#enumerator-field-add-button'),
+        ).toHaveAttribute('disabled')
+      })
+
+      await test.step('Add button is still disabled after navigating away and back', async () => {
+        await applicantQuestions.clickNext()
+        await applicantQuestions.clickPrevious()
+
+        await expect(
+          page.locator('#enumerator-field-add-button'),
+        ).toHaveAttribute('disabled')
+      })
+
+      await test.step('Add button is enabled with less than the maximum entities', async () => {
+        await applicantQuestions.deleteEnumeratorEntityByIndex(2)
 
         await expect(
           page.locator('#enumerator-field-add-button'),
@@ -330,7 +349,7 @@ test.describe('End to end enumerator test', () => {
         ).toHaveAttribute('disabled')
       })
 
-      await test.step('Add button is re-enabled when the blank item is removed', async () => {
+      await test.step('Add button is re-enabled when the blank entity is removed', async () => {
         await applicantQuestions.deleteEnumeratorEntityByIndex(2)
 
         await expect(
@@ -347,7 +366,7 @@ test.describe('End to end enumerator test', () => {
         ).not.toHaveAttribute('disabled')
       })
 
-      await test.step('Add button is disabled when an existing item is blanked', async () => {
+      await test.step('Add button is disabled when an existing entity is blanked', async () => {
         await applicantQuestions.editEnumeratorAnswer('Bugs', '')
 
         await expect(
@@ -514,6 +533,7 @@ test.describe('End to end enumerator test', () => {
         description: 'desc',
         questionText: 'Household members',
         helpText: 'list household members',
+        maxEntities: 3,
       })
       await adminQuestions.addNameQuestion({
         questionName: 'enumerator-ete-repeated-name',

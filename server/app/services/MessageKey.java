@@ -163,6 +163,7 @@ public enum MessageKey {
   ENUMERATOR_PLACEHOLDER_ENTITY_NAME("placeholder.entityName"),
   ENUMERATOR_VALIDATION_DUPLICATE_ENTITY_NAME("validation.duplicateEntityName"),
   ENUMERATOR_VALIDATION_ENTITY_REQUIRED("validation.entityNameRequired"),
+  ENUMERATOR_VALIDATION_TOO_MANY_ENTITIES("validation.tooManyEntities"),
   ERROR_INCOMPLETE_DATE("error.incompleteDate"),
   FILEUPLOAD_VALIDATION_FILE_REQUIRED("validation.fileRequired"),
   FILEUPLOAD_VALIDATION_FILE_TOO_LARGE("validation.fileTooLarge"),

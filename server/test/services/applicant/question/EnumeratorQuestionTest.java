@@ -37,6 +37,8 @@ public class EnumeratorQuestionTest extends ResetPostgres {
               .setQuestionHelpText(LocalizedStrings.of(Locale.US, "help text"))
               .setId(OptionalLong.of(1))
               .setLastModifiedTime(Optional.empty())
+              .setValidationPredicates(
+                  EnumeratorQuestionDefinition.EnumeratorValidationPredicates.create(3))
               .build(),
           LocalizedStrings.empty());
 
@@ -122,6 +124,29 @@ public class EnumeratorQuestionTest extends ResetPostgres {
                 applicantQuestion.getContextualizedPath(), ImmutableSet.of()))
         .containsOnly(
             ValidationErrorMessage.create(MessageKey.ENUMERATOR_VALIDATION_DUPLICATE_ENTITY_NAME));
+  }
+
+  @Test
+  public void withTooManyEntities_hasValidationErrors() {
+    ApplicantQuestion applicantQuestion =
+        new ApplicantQuestion(enumeratorQuestionDefinition, applicantData, Optional.empty());
+    QuestionAnswerer.answerEnumeratorQuestion(
+        applicantData,
+        applicantQuestion.getContextualizedPath(),
+        ImmutableList.of("one", "two", "three", "four"));
+
+    EnumeratorQuestion enumeratorQuestion = new EnumeratorQuestion(applicantQuestion);
+
+    assertThat(enumeratorQuestion.isAnswered()).isTrue();
+    assertThat(enumeratorQuestion.getEntityNames()).containsExactly("one", "two", "three", "four");
+    ImmutableMap<Path, ImmutableSet<ValidationErrorMessage>> validationErrors =
+        enumeratorQuestion.getValidationErrors();
+    assertThat(validationErrors.size()).isEqualTo(1);
+    assertThat(
+            validationErrors.getOrDefault(
+                applicantQuestion.getContextualizedPath(), ImmutableSet.of()))
+        .containsOnly(
+            ValidationErrorMessage.create(MessageKey.ENUMERATOR_VALIDATION_TOO_MANY_ENTITIES, 3));
   }
 
   @Test
