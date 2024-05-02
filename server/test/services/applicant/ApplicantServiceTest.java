@@ -3463,6 +3463,7 @@ public class ApplicantServiceTest extends ResetPostgres {
                     .setWellKnownId(2)
                     .build())
             .setSingleLineAddress("123 Some St Seattle, WA 99999")
+            .setCorrectionSource("https://some-fake-value")
             .build();
 
     AddressSuggestion addressSuggestion2 =
@@ -3483,6 +3484,7 @@ public class ApplicantServiceTest extends ResetPostgres {
                     .setWellKnownId(4)
                     .build())
             .setSingleLineAddress("456 Any Ave Seattle, WA 99999")
+            .setCorrectionSource("https://some-fake-value")
             .build();
 
     ImmutableList<AddressSuggestion> addressSuggestionList =

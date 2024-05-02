@@ -157,6 +157,7 @@ public class CsvExporterServiceTest extends AbstractExporterTest {
             "applicant address (state)",
             "applicant address (zip)",
             "applicant address (corrected)",
+            "applicant address (correction_source)",
             "applicant address (latitude)",
             "applicant address (longitude)",
             "applicant address (well_known_id)",

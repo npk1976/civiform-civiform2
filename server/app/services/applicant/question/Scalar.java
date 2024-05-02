@@ -19,6 +19,7 @@ import services.question.types.ScalarType;
 public enum Scalar {
   CITY("city", ScalarType.STRING),
   CORRECTED("corrected", ScalarType.STRING),
+  CORRECTION_SOURCE("correction_source", ScalarType.STRING),
   CURRENCY_CENTS("currency", ScalarType.CURRENCY_CENTS),
   DATE("date", ScalarType.DATE),
   EMAIL("email", ScalarType.STRING),
@@ -80,6 +81,7 @@ public enum Scalar {
           STATE,
           ZIP,
           CORRECTED,
+          CORRECTION_SOURCE,
           LATITUDE,
           LONGITUDE,
           WELL_KNOWN_ID,
