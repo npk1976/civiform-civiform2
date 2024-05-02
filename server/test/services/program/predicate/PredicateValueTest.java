@@ -24,15 +24,37 @@ public class PredicateValueTest {
   }
 
   @Test
-  public void stringValue_escapedProperly() {
+  public void value_string() {
     PredicateValue value = PredicateValue.of("hello");
     assertThat(value.value()).isEqualTo("\"hello\"");
   }
 
   @Test
-  public void listOfStringsValue_escapedProperly() {
+  public void value_stringWithQuotes() {
+    PredicateValue value = PredicateValue.of("\"\"h\"el\"\"lo\"\"\"\"\"");
+    assertThat(value.value()).isEqualTo("\"hello\"");
+  }
+
+  @Test
+  public void value_listOfStrings() {
     PredicateValue value = PredicateValue.listOfStrings(ImmutableList.of("hello", "world"));
     assertThat(value.value()).isEqualTo("[\"hello\", \"world\"]");
+  }
+
+  @Test
+  public void value_pairOfDates() {
+    LocalDate date1 = LocalDate.of(2024, 5, 1);
+    LocalDate date2 = LocalDate.of(2024, 5, 2);
+    PredicateValue value = PredicateValue.pairOfDates(date1, date2);
+
+    assertThat(value.value()).isEqualTo("[1714521600000, 1714608000000]");
+  }
+
+  @Test
+  public void value_pairOfLongs() {
+    PredicateValue value = PredicateValue.pairOfLongs(18, 30);
+
+    assertThat(value.value()).isEqualTo("[18, 30]");
   }
 
   @Test
@@ -102,6 +124,26 @@ public class PredicateValueTest {
   }
 
   @Test
+  public void toDisplayString_pairOfDates() {
+    QuestionDefinition dateDef = testQuestionBank.applicantDate().getQuestionDefinition();
+
+    LocalDate date1 = LocalDate.of(2024, 5, 1);
+    LocalDate date2 = LocalDate.of(2024, 5, 2);
+    PredicateValue value = PredicateValue.pairOfDates(date1, date2);
+
+    assertThat(value.toDisplayString(dateDef)).isEqualTo("2024-05-01 and 2024-05-02");
+  }
+
+  @Test
+  public void toDisplayString_pairOfLongs() {
+    QuestionDefinition dateDef = testQuestionBank.applicantDate().getQuestionDefinition();
+
+    PredicateValue value = PredicateValue.pairOfLongs(18, 30);
+
+    assertThat(value.toDisplayString(dateDef)).isEqualTo("18 and 30");
+  }
+
+  @Test
   public void valueWithoutSurroundingQuotes_parsesCorrectly() {
     PredicateValue value = PredicateValue.of("hello");
     assertThat(value.valueWithoutSurroundingQuotes()).isEqualTo("hello");
@@ -118,11 +160,5 @@ public class PredicateValueTest {
 
     value = PredicateValue.listOfLongs(ImmutableList.of(1L, 2L, 3L));
     assertThat(value.valueWithoutSurroundingQuotes()).isEqualTo("[1, 2, 3]");
-  }
-
-  @Test
-  public void surroundWithQuotes_stripsQuotesThenAppendsCorrectly() {
-    PredicateValue value = PredicateValue.of("\"\"h\"el\"\"lo\"\"\"\"\"");
-    assertThat(value.value()).isEqualTo("\"hello\"");
   }
 }
