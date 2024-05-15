@@ -1,5 +1,6 @@
 package services.applicant.predicate;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
@@ -59,6 +60,9 @@ public final class JsonPathPredicateGenerator {
       throws InvalidPredicateException {
     if (AGE_OPERATORS.contains(node.operator())) {
       return formatAgePredicate(node);
+    }
+    if (node.operator() == Operator.BETWEEN) {
+      return formatBetweenPredicate(node);
     }
 
     return JsonPathPredicate.create(
@@ -152,6 +156,30 @@ public final class JsonPathPredicateGenerator {
         throw new InvalidPredicateException(
             String.format("Expecting an age predicate but instead received %s", node.operator()));
     }
+  }
+
+  private JsonPathPredicate formatBetweenPredicate(LeafOperationExpressionNode node)
+      throws InvalidPredicateException {
+    // the between range is stored as a list of longs, e.g. "[123,456]"
+    ImmutableList<Long> values =
+        Splitter.on(",")
+            .splitToStream(
+                node.comparedValue()
+                    .value()
+                    .substring(1, node.comparedValue().value().length() - 1))
+            .map(String::trim)
+            .map(Long::parseLong)
+            .sorted()
+            .collect(ImmutableList.toImmutableList());
+    checkArgument(values.size() == 2);
+
+    return JsonPathPredicate.create(
+        String.format(
+            "%s[?(%2$s <= @.%4$s && @.%4$s <= %3$s)]",
+            getPath(node).predicateFormat(),
+            values.get(0),
+            values.get(1),
+            node.scalar().name().toLowerCase(Locale.ROOT)));
   }
 
   private Path getPath(LeafExpressionNode node) throws InvalidPredicateException {
