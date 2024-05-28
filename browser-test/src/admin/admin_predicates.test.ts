@@ -698,14 +698,21 @@ test.describe('create and edit predicates', () => {
       await adminQuestions.addTextQuestion({questionName: 'list of strings'})
       await adminQuestions.addNumberQuestion({questionName: 'single-long'})
       await adminQuestions.addNumberQuestion({questionName: 'list of longs'})
+      await adminQuestions.addNumberQuestion({questionName: 'number-between'})
       await adminQuestions.addCurrencyQuestion({
         questionName: 'predicate-currency',
+      })
+      await adminQuestions.addCurrencyQuestion({
+        questionName: 'predicate-currency-between',
       })
       await adminQuestions.addDateQuestion({
         questionName: 'predicate-date-is-earlier-than',
       })
       await adminQuestions.addDateQuestion({
         questionName: 'predicate-date-on-or-after',
+      })
+      await adminQuestions.addDateQuestion({
+        questionName: 'predicate-date-between',
       })
       await adminQuestions.addDateQuestion({
         questionName: 'predicate-date-age-older-than',
@@ -774,6 +781,14 @@ test.describe('create and edit predicates', () => {
       await adminPrograms.addProgramBlockUsingSpec(programName, {
         name: 'Screen 8',
         questions: [{name: 'both sides are lists'}],
+      })
+      await adminPrograms.addProgramBlockUsingSpec(programName, {
+        name: 'number-between-screen',
+        questions: [{name: 'number-between'}],
+      })
+      await adminPrograms.addProgramBlockUsingSpec(programName, {
+        name: 'number-between-screen',
+        questions: [{name: 'number-between'}],
       })
       await adminPrograms.addProgramBlockUsingSpec(programName, {
         name: 'Screen 9',
@@ -882,6 +897,45 @@ test.describe('create and edit predicates', () => {
         scalar: 'selections',
         operator: 'contains any of',
         value: 'dog,cat',
+      })
+
+      // Number between predicate
+      await adminPrograms.goToEditBlockVisibilityPredicatePage(
+        programName,
+        'number-between-screen',
+      )
+      await adminPredicates.addPredicates({
+        questionName: 'list of longs',
+        action: 'shown if',
+        scalar: 'number',
+        operator: 'is one of',
+        value: '123, 456',
+      })
+
+      // Currency between predicate
+      await adminPrograms.goToEditBlockVisibilityPredicatePage(
+        programName,
+        'Screen 6',
+      )
+      await adminPredicates.addPredicates({
+        questionName: 'predicate-currency-between',
+        action: 'shown if',
+        scalar: 'currency',
+        operator: 'is between',
+        complexValues: [{value:'100.01', secondValue: '105.64'}]
+      })
+
+      // Date between predicate
+      await adminPrograms.goToEditBlockVisibilityPredicatePage(
+        programName,
+        'Screen 6',
+      )
+      await adminPredicates.addPredicates({
+        questionName: 'predicate-date-between',
+        action: 'shown if',
+        scalar: 'date',
+        operator: 'is between',
+        complexValues: [{value:'2020-01-01', secondValue: '2021-01-01'}]
       })
 
       await adminPrograms.publishProgram(programName)
@@ -1158,7 +1212,7 @@ test.describe('create and edit predicates', () => {
         questionName: 'predicate-date-age-between',
         scalar: 'date',
         operator: 'age is between',
-        value: '1,90',
+        complexValues: [{value: '1', secondValue: '90'}],
       })
 
       // ensure the edit page renders without errors
