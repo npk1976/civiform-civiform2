@@ -92,6 +92,7 @@ lazy val root = (project in file("."))
 
       // Errorprone
       "com.google.errorprone" % "error_prone_core" % "2.27.1",
+      "org.checkerframework" % "dataflow-errorprone" % "3.42.0",
 
       // Apache libraries for export
       "org.apache.commons" % "commons-csv" % "1.11.0",
@@ -138,6 +139,7 @@ lazy val root = (project in file("."))
         .filter(_ != "true")
         .map(_ =>
           Seq(
+            "-processorpath", errorproneDependencyFiles,
             // Turn off the AutoValueSubclassLeaked error since the generated
             // code contains it - we can't control that.
             "-Xplugin:ErrorProne -Xep:AutoValueSubclassLeaked:OFF -Xep:CanIgnoreReturnValueSuggester:OFF -XepDisableWarningsInGeneratedCode -Xep:WildcardImport:ERROR -Xep:CatchingUnchecked:ERROR -Xep:ThrowsUncheckedException:ERROR",
@@ -147,6 +149,28 @@ lazy val root = (project in file("."))
         .getOrElse(Seq.empty)
 
       defaultCompilerOptions ++ errorProneCompilerOptions
+    },
+    javaOptions ++= {
+      val defaultJavaOptions = Seq()
+      val errorProneJavaOptions = Option(System.getenv("DISABLE_ERRORPRONE"))
+            .filter(_ != "true")
+            .map(_ =>
+              Seq(
+                "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+                "--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+                "--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED"
+              )
+            )
+            .getOrElse(Seq.empty)
+
+            defaultJavaOptions ++ errorProneJavaOptions
     },
 
     // Documented at https://github.com/sbt/zinc/blob/c18637c1b30f8ab7d1f702bb98301689ec75854b/internal/compiler-interface/src/main/contraband/incremental.contra
@@ -272,4 +296,22 @@ addCommandAlias(
 def generateSourcePath(scalaVersion: String): String = {
   val version = scalaVersion.split("\\.").take(2).mkString(".")
   s"target/scala-$version/src_managed/main"
+}
+
+// Building the list of errorprone files
+def errorproneDependencyFiles = {
+//  val home: String = sys.env("HOME")
+//  def file(name: String) = s"${home}/.cache/coursier/v1/https/repo1.maven.org/$name"
+
+//  val files = List(file("maven2/com/google/errorprone/error_prone_core/2.27.1/error_prone_core-2.27.1.jar"),
+//    file("maven2/org/checkerframework/dataflow-errorprone/3.42.0/dataflow-errorprone-3.42.0.jar"))
+  val files = List(
+    "error_prone_core-2.27.1-with-dependencies.jar",
+    "dataflow-errorprone-3.42.0-eisop3.jar"
+  )
+
+  val filestring = files.mkString(":")
+
+  println(s"Using errorprone libs from $filestring")
+  filestring
 }
