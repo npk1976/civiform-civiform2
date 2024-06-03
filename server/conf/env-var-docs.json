@@ -782,6 +782,11 @@
         "mode": "ADMIN_WRITEABLE",
         "description": "(NOT FOR PRODUCTION USE) Enables migrating programs between deployed environments",
         "type": "bool"
+      },
+      "MULTIPLE_FILE_UPLOAD": {
+        "mode": "ADMIN_WRITEABLE",
+        "description": "Enables multiple file uploads for file upload questions.",
+        "type": "bool"
       }
     }
   }

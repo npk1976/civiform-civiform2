@@ -940,6 +940,11 @@ public final class SettingsManifest extends AbstractSettingsManifest {
     return getBool("PROGRAM_MIGRATION_ENABLED", request);
   }
 
+  /** Enables multiple file uploads for file upload questions. */
+  public boolean getMultipleFileUpload(RequestHeader request) {
+    return getBool("MULTIPLE_FILE_UPLOAD", request);
+  }
+
   private static final ImmutableMap<String, SettingsSection> GENERATED_SECTIONS =
       ImmutableMap.of(
           "Branding",
@@ -1944,6 +1949,12 @@ public final class SettingsManifest extends AbstractSettingsManifest {
                       "PROGRAM_MIGRATION_ENABLED",
                       "(NOT FOR PRODUCTION USE) Enables migrating programs between deployed"
                           + " environments",
+                      /* isRequired= */ false,
+                      SettingType.BOOLEAN,
+                      SettingMode.ADMIN_WRITEABLE),
+                  SettingDescription.create(
+                      "MULTIPLE_FILE_UPLOAD",
+                      "Enables multiple file uploads for file upload questions.",
                       /* isRequired= */ false,
                       SettingType.BOOLEAN,
                       SettingMode.ADMIN_WRITEABLE))),
