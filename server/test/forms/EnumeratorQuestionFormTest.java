@@ -18,6 +18,7 @@ public class EnumeratorQuestionFormTest {
     form.setQuestionDescription("description");
     form.setQuestionText("What is the question text?");
     form.setQuestionHelpText("");
+    form.setMaxEntities("3");
     QuestionDefinitionBuilder builder = form.getBuilder();
 
     EnumeratorQuestionDefinition expected =
@@ -27,6 +28,8 @@ public class EnumeratorQuestionFormTest {
                 .setDescription("description")
                 .setQuestionText(LocalizedStrings.of(Locale.US, "What is the question text?"))
                 .setQuestionHelpText(LocalizedStrings.empty())
+                .setValidationPredicates(
+                    EnumeratorQuestionDefinition.EnumeratorValidationPredicates.create(3))
                 .build(),
             LocalizedStrings.empty());
 
@@ -44,6 +47,8 @@ public class EnumeratorQuestionFormTest {
                 .setDescription("description")
                 .setQuestionText(LocalizedStrings.of(Locale.US, "What is the question text?"))
                 .setQuestionHelpText(LocalizedStrings.empty())
+                .setValidationPredicates(
+                    EnumeratorQuestionDefinition.EnumeratorValidationPredicates.create(3))
                 .build(),
             LocalizedStrings.empty());
 

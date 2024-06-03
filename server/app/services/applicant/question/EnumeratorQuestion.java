@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.util.OptionalLong;
 import services.MessageKey;
 import services.Path;
 import services.applicant.ValidationErrorMessage;
@@ -51,6 +52,11 @@ public final class EnumeratorQuestion extends Question {
       errorsBuilder.add(
           ValidationErrorMessage.create(MessageKey.ENUMERATOR_VALIDATION_DUPLICATE_ENTITY_NAME));
     }
+    if (getMaxEntities().isPresent() && entityNames.size() > getMaxEntities().getAsLong()) {
+      errorsBuilder.add(
+          ValidationErrorMessage.create(
+              MessageKey.ENUMERATOR_VALIDATION_TOO_MANY_ENTITIES, getMaxEntities().getAsLong()));
+    }
     return errorsBuilder.build();
   }
 
@@ -73,6 +79,10 @@ public final class EnumeratorQuestion extends Question {
     return getQuestionDefinition()
         .getEntityType()
         .getOrDefault(applicantQuestion.getApplicantData().preferredLocale());
+  }
+
+  public OptionalLong getMaxEntities() {
+    return getQuestionDefinition().getMaxEntities();
   }
 
   @Override
